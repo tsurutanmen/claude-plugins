@@ -1,0 +1,9 @@
+{
+  "name": "sameness",
+  "description": "Measure whether the pages of one site share one template or look like unrelated sites.",
+  "version": "0.1.0",
+  "author": { "name": "tsurutanmen" },
+  "homepage": "https://github.com/tsurutanmen/sameness",
+  "repository": "https://github.com/tsurutanmen/sameness",
+  "license": "MIT"
+}

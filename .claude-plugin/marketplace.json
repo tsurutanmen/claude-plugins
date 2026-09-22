@@ -1,0 +1,31 @@
+{
+  "name": "tsurutalab",
+  "owner": {
+    "name": "tsurutanmen"
+  },
+  "metadata": {
+    "description": "Claude Code skills that build the control before the comparison."
+  },
+  "plugins": [
+    {
+      "name": "strictnull",
+      "source": "./plugins/strictnull",
+      "description": "Degree-preserving null models for any claim that a network is non-random or more clustered than chance."
+    },
+    {
+      "name": "sameness",
+      "source": "./plugins/sameness",
+      "description": "Measure whether the pages of one site share one template or look like unrelated sites."
+    },
+    {
+      "name": "searchdiff",
+      "source": "./plugins/searchdiff",
+      "description": "Did the SEO change work? Weekly difference-in-differences on Search Console data against control pages."
+    },
+    {
+      "name": "verifygate",
+      "source": "./plugins/verifygate",
+      "description": "Refuse to delegate coding work to another agent unless it comes with a check that can actually fail."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "strictnull",
+  "description": "Degree-preserving null models for any claim that a network is non-random or more clustered than chance.",
+  "version": "0.1.0",
+  "author": { "name": "tsurutanmen" },
+  "homepage": "https://github.com/tsurutanmen/strictnull",
+  "repository": "https://github.com/tsurutanmen/strictnull",
+  "license": "MIT"
+}

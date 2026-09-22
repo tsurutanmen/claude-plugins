@@ -1,0 +1,9 @@
+{
+  "name": "verifygate",
+  "description": "Refuse to delegate coding work to another agent unless it comes with a check that can actually fail.",
+  "version": "0.1.0",
+  "author": { "name": "tsurutanmen" },
+  "homepage": "https://github.com/tsurutanmen/verifygate",
+  "repository": "https://github.com/tsurutanmen/verifygate",
+  "license": "MIT"
+}

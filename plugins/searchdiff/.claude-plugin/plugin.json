@@ -1,0 +1,9 @@
+{
+  "name": "searchdiff",
+  "description": "Did the SEO change work? Weekly difference-in-differences on Search Console data against control pages.",
+  "version": "0.1.0",
+  "author": { "name": "tsurutanmen" },
+  "homepage": "https://github.com/tsurutanmen/searchdiff",
+  "repository": "https://github.com/tsurutanmen/searchdiff",
+  "license": "MIT"
+}
