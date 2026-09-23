@@ -32,6 +32,16 @@ COOLING_S = 120        # warn when the prompt cache goes cold within this many s
 MISS_SHOW_S = 60       # how long a new cache miss stays on the line
 DEFAULT_READ_TOKENS = 25_000
 BYTES_PER_TOKEN = 4
+
+
+def read_stdin():
+    """Claude Code sends UTF-8. On Windows, sys.stdin would decode it with the
+    ANSI code page (CP932 on Japanese systems), so read the bytes ourselves."""
+    data = sys.stdin.buffer.read()
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data.decode(sys.stdin.encoding or "utf-8", errors="replace")
 NOT_TEXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".pdf"}  # Read sizes these its own way
 
 
@@ -157,7 +167,7 @@ def fmt_seconds(s):
 
 
 def cmd_statusline():
-    raw = sys.stdin.read()
+    raw = read_stdin()
     try:
         data = json.loads(raw or "{}")
         a = analyse(data, now())
@@ -172,7 +182,7 @@ def cmd_statusline():
 
 def cmd_pretool():
     try:
-        payload = json.loads(sys.stdin.read() or "{}")
+        payload = json.loads(read_stdin() or "{}")
         if payload.get("tool_name") != "Read":
             return 0
         ti = payload.get("tool_input") or {}

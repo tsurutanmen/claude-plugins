@@ -1,8 +1,10 @@
 {
   "name": "knowledge-ledger",
   "description": "Keep a ledger, in git, of the lines the agent wrote and which of them you can explain in your own words.",
-  "version": "0.1.0",
-  "author": { "name": "tsurutanmen" },
+  "version": "0.1.1",
+  "author": {
+    "name": "tsurutanmen"
+  },
   "homepage": "https://github.com/tsurutanmen/claude-plugins",
   "repository": "https://github.com/tsurutanmen/claude-plugins",
   "license": "MIT"

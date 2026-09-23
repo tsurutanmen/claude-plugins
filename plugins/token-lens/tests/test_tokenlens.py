@@ -20,7 +20,8 @@ class Base(unittest.TestCase):
         self.tmp.cleanup()
 
     def run_cmd(self, args, stdin, now=T0, extra_env=None):
-        env = {**os.environ, "TOKEN_LENS_STATE_DIR": str(self.state),
+        env = {**{k: v for k, v in os.environ.items() if k not in ("PYTHONUTF8", "PYTHONIOENCODING")},
+               "TOKEN_LENS_STATE_DIR": str(self.state),
                "TOKEN_LENS_NOW": str(now), "TOKEN_LENS_DEBUG": "1", "NO_COLOR": "1"}
         env.update(extra_env or {})
         return subprocess.run([sys.executable, str(SCRIPT), *args], input=stdin,
@@ -35,7 +36,7 @@ class Base(unittest.TestCase):
         if five is not None:
             data["rate_limits"] = {"five_hour": {"used_percentage": five,
                                                  "resets_at": resets or now + 4 * 3600}}
-        r = self.run_cmd(["statusline"], json.dumps(data), now=now)
+        r = self.run_cmd(["statusline"], json.dumps(data, ensure_ascii=False), now=now)
         self.assertEqual(r.returncode, 0, r.stderr)
         debug = json.loads(r.stderr.strip().splitlines()[-1])
         return r.stdout, debug
@@ -115,6 +116,12 @@ class Statusline(Base):
         self.assertEqual(d["tier"], "sprint")
 
     # --- robustness ----------------------------------------------------------
+    def test_japanese_model_name(self):
+        data = {"session_id": "jp", "model": {"display_name": "モデル"}, "cwd": "C:/プロジェクト"}
+        r = self.run_cmd(["statusline"], json.dumps(data, ensure_ascii=False))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("モデル", r.stdout)
+
     def test_missing_fields(self):
         out, d = self.line(T0)
         self.assertEqual(d["tier"], "sleep")
