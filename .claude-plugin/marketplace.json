@@ -26,6 +26,11 @@
       "name": "verifygate",
       "source": "./plugins/verifygate",
       "description": "Refuse to delegate coding work to another agent unless it comes with a check that can actually fail."
+    },
+    {
+      "name": "knowledge-ledger",
+      "source": "./plugins/knowledge-ledger",
+      "description": "Keep a ledger, in git, of the lines the agent wrote and which of them you can explain in your own words."
     }
   ]
 }
