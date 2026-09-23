@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/token-lens/scripts/tokenlens.py\" pretool 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/skills/token-lens/scripts/tokenlens.py\" pretool",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
