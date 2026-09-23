@@ -26,8 +26,10 @@ class Base(unittest.TestCase):
         return subprocess.run([sys.executable, str(SCRIPT), *args], input=stdin,
                               capture_output=True, text=True, encoding="utf-8", env=env)
 
-    def line(self, now, cost=None, five=None, resets=None, session="s1"):
+    def line(self, now, cost=None, five=None, resets=None, session="s1", cache=None):
         data = {"session_id": session, "model": {"display_name": "Opus"}}
+        if cache is not None:
+            data["prompt_cache"] = cache
         if cost is not None:
             data["cost"] = {"total_cost_usd": cost}
         if five is not None:
@@ -165,6 +167,51 @@ class PreToolUse(Base):
         r = self.run_cmd(["pretool"], "{nope")
         self.assertEqual(r.returncode, 0)
         self.assertEqual(r.stdout.strip(), "")
+
+
+class PromptCache(Base):
+    def warm(self, now, expires_in, misses=0, cause=None):
+        return {"warm": True, "caching_observed": True, "expires_at": now + expires_in,
+                "misses": misses, "last_miss_cause": cause, "recache_tokens_if_cold": 120_000}
+
+    def test_far_from_expiry_says_nothing(self):
+        out, _ = self.line(T0, cache=self.warm(T0, 240))
+        self.assertNotIn("cache", out)
+
+    def test_close_to_expiry_counts_down(self):
+        out, d = self.line(T0, cache=self.warm(T0, 100))
+        self.assertIn("cache cools in 1m40s", out)
+        self.assertEqual(d["cache"], "cooling")
+
+    def test_cold_says_what_the_next_reply_costs(self):
+        cold = {"warm": False, "caching_observed": True, "expires_at": None,
+                "recache_tokens_if_cold": 120_000, "misses": 0}
+        out, d = self.line(T0, cache=cold)
+        self.assertIn("cache cold", out)
+        self.assertIn("120k", out)
+
+    def test_no_caching_says_nothing(self):
+        out, _ = self.line(T0, cache={"warm": False, "caching_observed": False})
+        self.assertNotIn("cache", out)
+
+    def test_new_miss_is_shown_with_its_cause(self):
+        self.line(T0, cache=self.warm(T0, 250, misses=0))
+        out, d = self.line(T0 + 5, cache=self.warm(T0 + 5, 250, misses=1, cause="system_prompt_changed"))
+        self.assertIn("cache miss", out)
+        self.assertIn("system_prompt_changed", out)
+
+    def test_old_miss_is_not_repeated(self):
+        # a miss from before token-lens started watching has no known time
+        first, _ = self.line(T0, cache=self.warm(T0, 250, misses=1, cause="x"))
+        self.assertNotIn("cache miss", first)
+        out, _ = self.line(T0 + 120, cache=self.warm(T0 + 120, 250, misses=1, cause="x"))
+        self.assertNotIn("cache miss", out)
+
+    def test_miss_notice_fades_after_a_minute(self):
+        self.line(T0, cache=self.warm(T0, 250, misses=0))
+        self.line(T0 + 5, cache=self.warm(T0 + 5, 250, misses=1, cause="x"))
+        out, _ = self.line(T0 + 70, cache=self.warm(T0 + 70, 250, misses=1, cause="x"))
+        self.assertNotIn("cache miss", out)
 
 
 if __name__ == "__main__":

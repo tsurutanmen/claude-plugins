@@ -3,8 +3,9 @@
 A cat in the Claude Code status line that runs as fast as you spend.
 
 ```
-ᓚᘏᗢ·········· zZ  Opus 5.5  5h 40%
+ᓚᘏᗢ·········· zZ  Opus 5.5  5h 40%  cache cools in 1m40s
 ····ᓚᘏᗢ······  Opus 5.5  5h 50% · full in 1h40m
+ᓚᘏᗢ·········· zZ  Opus 5.5  5h 51%  cache cold: next reply re-caches 120k
 ```
 
 ```
@@ -22,6 +23,11 @@ itself; the skill edits your settings after asking).
   is the session's estimated cost per minute over the last 5 minutes.
 - **`full in 1h40m`.** Shown only when the five-hour window would fill before it resets at the
   current pace, so you see it while there is still time to slow down.
+- **The prompt cache.** From the `prompt_cache` object Claude Code sends to the status line
+  (v2.1.251 or later): `cache cools in 1m40s` in the last two minutes before the cached prefix
+  expires, `cache cold: next reply re-caches 120k` once it has, and `cache miss (<cause>)` for a
+  minute after Claude Code records a new miss. The numbers are Claude Code's; token-lens only
+  decides when to show them.
 - **Large reads.** A `PreToolUse` hook asks before Read opens a text file of about 25,000 tokens
   or more whole (bytes ÷ 4), and suggests `offset`/`limit` or Grep. Set `TOKEN_LENS_READ_TOKENS`
   to change the threshold.

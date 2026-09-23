@@ -1,8 +1,10 @@
 {
   "name": "token-lens",
-  "description": "A cat in the status line that runs as fast as you spend, says when the five-hour limit will fill at this pace, and asks before a huge file is read whole.",
-  "version": "0.1.0",
-  "author": { "name": "tsurutanmen" },
+  "description": "A cat in the status line that runs as fast as you spend, says when the five-hour limit will fill and when the prompt cache goes cold, and asks before a huge file is read whole.",
+  "version": "0.2.0",
+  "author": {
+    "name": "tsurutanmen"
+  },
   "homepage": "https://github.com/tsurutanmen/claude-plugins",
   "repository": "https://github.com/tsurutanmen/claude-plugins",
   "license": "MIT"

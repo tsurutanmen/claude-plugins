@@ -28,6 +28,8 @@ SPEED = {"sleep": 0, "walk": 0.5, "run": 1, "sprint": 2}  # cells per second
 COST_PER_MIN = [0.01, 0.2, 1.0]    # $/min at which walk, run, sprint begin
 FIVE_PER_HOUR = [0.5, 10, 25]      # five-hour %/h at which walk, run, sprint begin
 COLOR = {"sleep": "2", "walk": "32", "run": "33", "sprint": "31"}
+COOLING_S = 120        # warn when the prompt cache goes cold within this many seconds
+MISS_SHOW_S = 60       # how long a new cache miss stays on the line
 DEFAULT_READ_TOKENS = 25_000
 BYTES_PER_TOKEN = 4
 NOT_TEXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".pdf"}  # Read sizes these its own way
@@ -88,7 +90,38 @@ def analyse(data, t):
 
     pos = int(t * SPEED[tier]) % WIDTH
     return {"tier": tier, "pos": pos, "width": WIDTH, "full_in_s": full_in,
-            "five": pct, "cost": cost}
+            "five": pct, "cost": cost, **cache_state(data, t, path)}
+
+
+def cache_state(data, t, path):
+    """What to say about the prompt cache, from the prompt_cache object Claude Code sends."""
+    pc = data.get("prompt_cache") or {}
+    side = path.with_suffix(".cache.json")
+    try:
+        prev = json.loads(side.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        prev = {}
+    misses = pc.get("misses") or 0
+    miss_at, cause = prev.get("miss_at"), prev.get("cause")
+    if "misses" in prev and misses > prev["misses"]:
+        miss_at, cause = t, pc.get("last_miss_cause")
+    try:
+        side.write_text(json.dumps({"misses": misses, "miss_at": miss_at, "cause": cause}),
+                        encoding="utf-8")
+    except OSError:
+        pass
+    out = {"cache": None, "cache_left_s": None, "recache": pc.get("recache_tokens_if_cold")}
+    if miss_at is not None and t - miss_at <= MISS_SHOW_S:
+        out.update(cache="miss", cause=cause)
+    elif not pc.get("warm"):
+        out["cache"] = "cold" if out["recache"] else None
+    elif pc.get("expires_at") and 0 < pc["expires_at"] - t <= COOLING_S:
+        out.update(cache="cooling", cache_left_s=pc["expires_at"] - t)
+    return out
+
+
+def fmt_tokens(n):
+    return f"{n / 1000:.0f}k" if n >= 1000 else str(n)
 
 
 def render(a, data):
@@ -109,7 +142,18 @@ def render(a, data):
         parts.append(five)
     elif a["cost"] is not None:
         parts.append(f"${a['cost']:.2f}")
+    if a.get("cache") == "miss":
+        parts.append(f"cache miss ({a.get('cause') or 'cause unknown'})")
+    elif a.get("cache") == "cooling":
+        parts.append(f"cache cools in {fmt_seconds(a['cache_left_s'])}")
+    elif a.get("cache") == "cold":
+        parts.append(f"cache cold: next reply re-caches {fmt_tokens(a['recache'])}")
     return "  ".join(parts)
+
+
+def fmt_seconds(s):
+    s = int(s)
+    return f"{s // 60}m{s % 60:02d}s" if s >= 60 else f"{s}s"
 
 
 def cmd_statusline():
