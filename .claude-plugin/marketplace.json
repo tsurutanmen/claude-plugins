@@ -31,6 +31,11 @@
       "name": "knowledge-ledger",
       "source": "./plugins/knowledge-ledger",
       "description": "Keep a ledger, in git, of the lines the agent wrote and which of them you can explain in your own words."
+    },
+    {
+      "name": "token-lens",
+      "source": "./plugins/token-lens",
+      "description": "A cat in the status line that runs as fast as you spend, and says when the five-hour limit will fill at this pace."
     }
   ]
 }
