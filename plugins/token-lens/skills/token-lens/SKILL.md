@@ -13,6 +13,11 @@ Two parts:
   measured over the last 30 minutes; otherwise from the session's estimated cost,
   measured over the last 5 minutes. If the five-hour window would fill before it
   resets at the current pace, the line adds `full in 1h40m`.
+- **Prompt cache.** From Claude Code's own `prompt_cache` statistics: a countdown
+  in the last two minutes before the cache goes cold, how many tokens the next
+  reply will re-cache once it is cold, and a new cache miss with its cause for one
+  minute. If the user asks whether to reply now or later, this is the number to
+  point at: after the cache goes cold, the next reply pays to write it again.
 - **Hook** (installed with the plugin). Before Read opens a text file of about
   25,000 tokens or more without `offset`/`limit`, it asks first and says the
   estimate. Change the threshold with the `TOKEN_LENS_READ_TOKENS` environment
