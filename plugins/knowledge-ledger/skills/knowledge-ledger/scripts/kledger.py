@@ -17,11 +17,22 @@ import os
 import subprocess
 import sys
 import time
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
 LEDGER_DIR = ".knowledge-ledger"
-MIN_EXPLANATION = 40  # characters
+MIN_EXPLANATION = 40  # display width: a full-width character (Japanese, Chinese, Korean) counts as 2
+
+
+def read_stdin():
+    """Claude Code sends UTF-8. On Windows, sys.stdin would decode it with the
+    ANSI code page (CP932 on Japanese systems), so read the bytes ourselves."""
+    data = sys.stdin.buffer.read()
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data.decode(sys.stdin.encoding or "utf-8", errors="replace")
 
 
 # --- lines ------------------------------------------------------------------
@@ -116,7 +127,7 @@ def cmd_record(args):
     if args.git:
         return record_git()
     try:
-        payload = json.loads(sys.stdin.read() or "{}")
+        payload = json.loads(read_stdin() or "{}")
         root = project_root(payload.get("cwd"))
         file_path, hs = from_hook(payload)
         r = rel(root, file_path) if file_path else None
@@ -208,9 +219,10 @@ def cmd_explain(args):
     except ValueError:
         print("--lines takes A-B, e.g. 10-24", file=sys.stderr)
         return 2
-    text = sys.stdin.read().strip()
-    if len(text) < MIN_EXPLANATION:
-        print(f"explanation too short ({len(text)} chars, need {MIN_EXPLANATION}). "
+    text = read_stdin().strip()
+    width = sum(2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in text)
+    if width < MIN_EXPLANATION:
+        print(f"explanation too short ({width} of {MIN_EXPLANATION}; full-width characters count as 2). "
               "Say what the lines do and why, in your own words.", file=sys.stderr)
         return 1
     lines = (root / r).read_text(encoding="utf-8", errors="replace").splitlines()[a - 1:b]

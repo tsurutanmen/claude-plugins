@@ -1,7 +1,7 @@
 {
   "name": "token-lens",
   "description": "A cat in the status line that runs as fast as you spend, says when the five-hour limit will fill and when the prompt cache goes cold, and asks before a huge file is read whole.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": {
     "name": "tsurutanmen"
   },

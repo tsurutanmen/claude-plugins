@@ -1,8 +1,10 @@
 {
   "name": "commit-coach",
   "description": "Before a git command throws work away, dry-run it and say exactly what would be lost, in plain words, and ask. Silent when nothing would be lost.",
-  "version": "0.1.0",
-  "author": { "name": "tsurutanmen" },
+  "version": "0.1.1",
+  "author": {
+    "name": "tsurutanmen"
+  },
   "homepage": "https://github.com/tsurutanmen/claude-plugins",
   "repository": "https://github.com/tsurutanmen/claude-plugins",
   "license": "MIT"

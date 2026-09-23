@@ -18,6 +18,16 @@ import sys
 
 MAX_LIST = 8
 
+
+def read_stdin():
+    """Claude Code sends UTF-8. On Windows, sys.stdin would decode it with the
+    ANSI code page (CP932 on Japanese systems), so read the bytes ourselves."""
+    data = sys.stdin.buffer.read()
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data.decode(sys.stdin.encoding or "utf-8", errors="replace")
+
 TEXT = {
     "en": {
         "reset_files": "`git reset --hard` throws away uncommitted changes. These would be gone, and git cannot bring them back:\n{files}",
@@ -82,7 +92,7 @@ def bullet(items):
 
 # --- git -----------------------------------------------------------------------
 def run_git(cwd, *args):
-    r = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True,
+    r = subprocess.run(["git", "-c", "core.quotepath=false", *args], cwd=cwd, capture_output=True, text=True,
                        encoding="utf-8", errors="replace", timeout=10)
     return r.stdout if r.returncode == 0 else None
 
@@ -261,7 +271,7 @@ def assess(command, cwd):
 
 def main():
     try:
-        payload = json.loads(sys.stdin.read() or "{}")
+        payload = json.loads(read_stdin() or "{}")
         if payload.get("tool_name") != "Bash":
             return 0
         command = (payload.get("tool_input") or {}).get("command") or ""

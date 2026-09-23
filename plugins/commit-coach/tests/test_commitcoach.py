@@ -42,9 +42,10 @@ class Base(unittest.TestCase):
     def hook(self, command, cwd=None, env=None):
         payload = {"hook_event_name": "PreToolUse", "tool_name": "Bash",
                    "tool_input": {"command": command}, "cwd": str(cwd or self.repo)}
-        r = subprocess.run([sys.executable, str(SCRIPT)], input=json.dumps(payload),
+        r = subprocess.run([sys.executable, str(SCRIPT)], input=json.dumps(payload, ensure_ascii=False),
                            capture_output=True, text=True, encoding="utf-8",
-                           env={**os.environ, "COMMIT_COACH_LANG": "en", **(env or {})})
+                           env={**{k: v for k, v in os.environ.items() if k not in ("PYTHONUTF8", "PYTHONIOENCODING")},
+                                "COMMIT_COACH_LANG": "en", **(env or {})})
         self.assertEqual(r.returncode, 0, r.stderr)
         if not r.stdout.strip():
             return None
@@ -208,7 +209,7 @@ class Parsing(Base):
 
     def test_other_tools_are_silent(self):
         payload = {"tool_name": "Read", "tool_input": {"file_path": "x"}, "cwd": str(self.repo)}
-        r = subprocess.run([sys.executable, str(SCRIPT)], input=json.dumps(payload),
+        r = subprocess.run([sys.executable, str(SCRIPT)], input=json.dumps(payload, ensure_ascii=False),
                            capture_output=True, text=True)
         self.assertEqual((r.returncode, r.stdout.strip()), (0, ""))
 
@@ -219,6 +220,27 @@ class Parsing(Base):
 
     def test_outside_a_repo_is_silent(self):
         self.assertIsNone(self.hook("git reset --hard", cwd=self.root))
+
+    def test_japanese_file_names_are_readable(self):
+        commit(self.repo, "設定.txt", "one\n")
+        (self.repo / "設定.txt").write_text("changed\n", encoding="utf-8")
+        decision, reason = self.hook("git reset --hard")
+        self.assertEqual(decision, "ask")
+        self.assertIn("設定.txt", reason)
+
+    def test_japanese_in_the_command_line(self):
+        self.dirty()
+        decision, _ = self.hook("git status && echo '日本語' && git reset --hard")
+        self.assertEqual(decision, "ask")
+
+    def test_repository_in_a_japanese_folder(self):
+        # the hook's cwd arrives as raw UTF-8; read wrongly, git runs nowhere and the guard goes quiet
+        repo = init(self.root / "作業フォルダ")
+        commit(repo, "a.txt", "one\n")
+        (repo / "a.txt").write_text("changed\n", encoding="utf-8")
+        decision, reason = self.hook("git reset --hard", cwd=repo)
+        self.assertEqual(decision, "ask")
+        self.assertIn("a.txt", reason)
 
     def test_deny_mode(self):
         self.dirty()

@@ -14,14 +14,15 @@ def run(root, *args, stdin=None):
     return subprocess.run(
         [sys.executable, str(SCRIPT), *args],
         input=stdin, capture_output=True, text=True, encoding="utf-8",
-        cwd=root, env={**os.environ, "CLAUDE_PROJECT_DIR": str(root)},
+        cwd=root, env={**{k: v for k, v in os.environ.items() if k not in ("PYTHONUTF8", "PYTHONIOENCODING")},
+                       "CLAUDE_PROJECT_DIR": str(root)},
     )
 
 
 def hook(root, tool, tool_input):
     payload = {"hook_event_name": "PostToolUse", "tool_name": tool,
                "tool_input": tool_input, "cwd": str(root), "session_id": "s1"}
-    return run(root, "record", stdin=json.dumps(payload))
+    return run(root, "record", stdin=json.dumps(payload, ensure_ascii=False))  # Claude Code sends raw UTF-8
 
 
 def status(root):
@@ -148,6 +149,27 @@ class Ledger(unittest.TestCase):
         run(self.root, "record", "--git")  # twice must not double-count
         s = status(self.root)
         self.assertEqual((s["ai_lines"], s["total_lines"]), (1, 2))
+
+    def test_japanese_content_is_recorded(self):
+        # Claude Code sends UTF-8; on Windows Python would read stdin as CP932
+        self.f = self.root / "日本語.py"
+        self.write("# 設定ファイル\nname = '日本語のテスト'\nprint('こんにちは')\n")
+        s = status(self.root)
+        self.assertEqual(s["ai_lines"], 3)
+        self.assertEqual(s["files"][0]["file"], "日本語.py")
+
+    def test_japanese_explanation(self):
+        self.write(BODY)
+        r = run(self.root, "explain", "calc.py", "--lines", "1-2",
+                stdin="二つの数を受け取り、その和を total に入れて、そのまま返す関数です。")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(status(self.root)["explained"], 2)
+
+    def test_short_japanese_explanation_is_refused(self):
+        self.write(BODY)
+        r = run(self.root, "explain", "calc.py", "--lines", "1-2", stdin="足す関数")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertEqual(status(self.root)["explained"], 0)
 
     def test_status_text_mentions_debt(self):
         self.write(BODY)
