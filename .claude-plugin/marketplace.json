@@ -57,6 +57,14 @@
         "repo": "tsurutanmen/homedot-panel"
       },
       "description": "Show your homedot agents and the five-hour limit, with minutes until it resets, in the status line."
+    },
+    {
+      "name": "session-dash",
+      "source": {
+        "source": "github",
+        "repo": "tsurutanmen/session-dash"
+      },
+      "description": "Your usage limits above the prompt, and a pane with background work and the file each open session is on."
     }
   ]
 }

@@ -25,6 +25,7 @@ call it directly, for example `/verifygate:verifygate`.
 | [knowledge-ledger](plugins/knowledge-ledger) | The agent writes code you will have to maintain | Shipping code nobody on the team can explain, without anyone noticing how much of it there is |
 | [session-bridge](https://github.com/tsurutanmen/session-bridge) | You have several sessions open and want them to talk, or want to ask one from your voice or a script | Copying messages between windows by hand, and switching windows just to ask how far a session got |
 | [homedot-panel](https://github.com/tsurutanmen/homedot-panel) | You run [homedot](https://github.com/tsurutanmen/homedot), a Dots-style agent on your own PC | Not noticing that the agent stopped, or that it is waiting for your approval |
+| [session-dash](https://github.com/tsurutanmen/session-dash) | You keep several sessions open and want to see your limits and what each one is doing | Hitting the five-hour limit by surprise, and opening each window to find which session is touching which file |
 
 ## The command-line tools
 
@@ -37,7 +38,7 @@ pip install git+https://github.com/tsurutanmen/verifygate
 
 Source, tests, and full documentation live in each tool's own repository, linked above.
 knowledge-ledger, token-lens and commit-coach have no package to install: their scripts ship inside the plugins and use only the
-Python standard library. session-bridge is a mod (a hooks plugin); its `bridge.py` for scripts lives in its repository.
+Python standard library. session-bridge and session-dash are mods (hooks plugins); session-bridge's `bridge.py` for scripts lives in its repository.
 
 ## License
 
