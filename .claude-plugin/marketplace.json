@@ -49,6 +49,14 @@
         "repo": "tsurutanmen/session-bridge"
       },
       "description": "Let your open Claude Code sessions talk to each other, and reach any of them from your voice or a script."
+    },
+    {
+      "name": "homedot-panel",
+      "source": {
+        "source": "github",
+        "repo": "tsurutanmen/homedot-panel"
+      },
+      "description": "Show your homedot agents and the five-hour limit, with minutes until it resets, in the status line."
     }
   ]
 }
