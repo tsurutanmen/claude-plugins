@@ -24,6 +24,7 @@ call it directly, for example `/verifygate:verifygate`.
 | [commit-coach](plugins/commit-coach) | The agent is about to run reset --hard, clean -f, push --force, branch -D and the like | Losing uncommitted work or someone else's commits without being told which |
 | [knowledge-ledger](plugins/knowledge-ledger) | The agent writes code you will have to maintain | Shipping code nobody on the team can explain, without anyone noticing how much of it there is |
 | [session-bridge](https://github.com/tsurutanmen/session-bridge) | You have several sessions open and want them to talk, or want to ask one from your voice or a script | Copying messages between windows by hand, and switching windows just to ask how far a session got |
+| [homedot-panel](https://github.com/tsurutanmen/homedot-panel) | You run [homedot](https://github.com/tsurutanmen/homedot), a Dots-style agent on your own PC | Not noticing that the agent stopped, or that it is waiting for your approval |
 
 ## The command-line tools
 
