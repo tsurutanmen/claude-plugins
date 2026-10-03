@@ -3,7 +3,8 @@
 Skills that stop Claude from reporting a result the evidence cannot yet support. Four of them
 build the control before the comparison. knowledge-ledger keeps count of the code the agent wrote that
 you have not yet explained, token-lens puts a cat in the status line that runs as fast as you
-spend, and commit-coach says what a git command would throw away before it runs.
+spend, commit-coach says what a git command would throw away before it runs, and session-bridge
+lets your open sessions talk to each other.
 
 ```
 /plugin marketplace add tsurutanmen/claude-plugins
@@ -22,6 +23,7 @@ call it directly, for example `/verifygate:verifygate`.
 | [token-lens](plugins/token-lens) | You want to see how fast the session is using your limit | Finding out the five-hour window is full only when it is |
 | [commit-coach](plugins/commit-coach) | The agent is about to run reset --hard, clean -f, push --force, branch -D and the like | Losing uncommitted work or someone else's commits without being told which |
 | [knowledge-ledger](plugins/knowledge-ledger) | The agent writes code you will have to maintain | Shipping code nobody on the team can explain, without anyone noticing how much of it there is |
+| [session-bridge](https://github.com/tsurutanmen/session-bridge) | You have several sessions open and want them to talk, or want to ask one from your voice or a script | Copying messages between windows by hand, and switching windows just to ask how far a session got |
 
 ## The command-line tools
 
@@ -34,7 +36,7 @@ pip install git+https://github.com/tsurutanmen/verifygate
 
 Source, tests, and full documentation live in each tool's own repository, linked above.
 knowledge-ledger, token-lens and commit-coach have no package to install: their scripts ship inside the plugins and use only the
-Python standard library.
+Python standard library. session-bridge is a mod (a hooks plugin); its `bridge.py` for scripts lives in its repository.
 
 ## License
 

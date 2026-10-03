@@ -41,6 +41,14 @@
       "name": "commit-coach",
       "source": "./plugins/commit-coach",
       "description": "Before a git command throws work away, dry-run it and say exactly what would be lost, and ask."
+    },
+    {
+      "name": "session-bridge",
+      "source": {
+        "source": "github",
+        "repo": "tsurutanmen/session-bridge"
+      },
+      "description": "Let your open Claude Code sessions talk to each other, and reach any of them from your voice or a script."
     }
   ]
 }
